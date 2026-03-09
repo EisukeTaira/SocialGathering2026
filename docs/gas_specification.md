@@ -20,13 +20,17 @@
 ## 🌲 シート2: `Bracket`（トーナメント表）
 **役割**: トーナメント表（`bracket.html`）の描画と、勝者の自動勝ち上がりを制御します。
 
-| A: ID | B: コート番号 | C: ラウンド | D: 試合順 | E: チームA | F: チームB | G: A得点 | H: B得点 | I: 勝者名 | J: 次の試合ID | K: 次の試合スロット |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **説明** | 試合ID | コート番号 | 1回戦... | チーム名1 | チーム名2 | Aの最終点 | Bの最終点 | 勝者名 | 進む先のID | A か B を指定 |
-| **入力例** | **M1** | 1 | 1回戦 | Aチーム | Bチーム | 21 | 15 | Aチーム | **M3** | **A** |
+| A: ID | B: コート番号 | C: ラウンド | D: 試合順 | E: チームA | F: チームB | G: A得点 | H: B得点 | I: 勝者名 | J: 次の試合ID | K: 次の試合スロット | L: 敗者進む先のID | M: 敗者進むスロット |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **M1** | 1 | 1回戦 | 1 | チーム3 | チーム6 | | | | **M3** | **B** | **L1** | **A** |
+| **M2** | 1 | 1回戦 | 2 | チーム4 | チーム5 | | | | **M4** | **B** | **L1** | **B** |
+| **M3** | 1 | 準決勝 | 1 | チーム1 | (M1勝者) | | | | **M5** | **A** | **L2** | **A** |
+| **M4** | 1 | 準決勝 | 2 | チーム2 | (M2勝者) | | | | **M5** | **B** | **L2** | **B** |
+| **M5** | 1 | 決勝 | 1 | (M3勝者) | (M4勝者) | | | | | | | |
 
-### 💡 勝者の自動反映（サーバーサイド）
-- 試合終了時、勝者の名前が自動的に `次の試合ID` で指定された試合の `チームA` または `チームB`（次の試合スロットで指定）に書き込まれます。
+> [!TIP]
+> 6チームの場合、シードチーム（1, 2）はM3, M4から開始するようにデータをセットします。
+> 敗者復活戦（裏トーナメント）進む先の試合IDは L1, L2 のようにIDを区別して設定します。
 
 ---
 
@@ -121,12 +125,87 @@ function updateMatchesSheet(ss, court, scoreA, scoreB) {
 }
 
 function finishMatch(ss, params) {
-  // 1. Bracketシートの更新
-  // 2. 勝者を次の試合IDのスロットへ移動
-  // 3. Matchesシートを「終了」に更新
-  // 4. ScoreInputの許可を「NG」に戻す
-  // (詳細なロジックは実装フェーズで構築)
-  return createJsonResponse({"success": true, "message": "Match results reflected"});
+  var court = params.court;
+  var scoreInputSheet = ss.getSheetByName('ScoreInput');
+  var bracketSheet = ss.getSheetByName('Bracket');
+  var matchesSheet = ss.getSheetByName('Matches');
+  
+  // 1. ScoreInputから最終データ取得
+  var scoreInputData = scoreInputSheet.getDataRange().getValues();
+  var matchData = null;
+  var rowIndexInput = -1;
+  
+  for (var i = 1; i < scoreInputData.length; i++) {
+    if (scoreInputData[i][0] == court) {
+      matchData = scoreInputData[i];
+      rowIndexInput = i + 1;
+      break;
+    }
+  }
+  
+  if (!matchData) return createJsonResponse({"success": false, "message": "Court not found"});
+  
+  var scoreA = matchData[1];
+  var scoreB = matchData[2];
+  
+  // 2. Matchesシートの該当試合を特定 (チーム名取得のため)
+  var matchesData = matchesSheet.getDataRange().getValues();
+  var teamA = "", teamB = "", rowIndexMatch = -1;
+  for (var i = 1; i < matchesData.length; i++) {
+    if (matchesData[i][0] == court && matchesData[i][6] === '試合中') {
+      teamA = matchesData[i][1];
+      teamB = matchesData[i][2];
+      rowIndexMatch = i + 1;
+      break;
+    }
+  }
+  
+  var winnerName = scoreA > scoreB ? teamA : teamB;
+
+  // 3. Bracketシートの該当試合を探して更新
+  var bracketData = bracketSheet.getDataRange().getValues();
+  for (var i = 1; i < bracketData.length; i++) {
+    // チーム名が一致する現在の試合を特定
+    if (bracketData[i][4] === teamA && bracketData[i][5] === teamB) {
+      bracketSheet.getRange(i + 1, 7, 1, 3).setValues([[scoreA, scoreB, winnerName]]);
+      
+      // 次の試合へ勝利者を送る
+      var nextMatchId = bracketData[i][9]; // J: 次の試合ID
+      var nextSlot = bracketData[i][10];   // K: 次の試合スロット (A or B)
+      
+      if (nextMatchId) {
+        updateNextMatch(ss, bracketSheet, bracketData, nextMatchId, nextSlot, winnerName);
+      }
+
+      // 次の試合へ敗者を送る
+      var loserName = scoreA > scoreB ? teamB : teamA;
+      var loserNextMatchId = bracketData[i][11]; // L: 敗者進む先のID
+      var loserNextSlot = bracketData[i][12];    // M: 敗者進むスロット (A or B)
+
+      if (loserNextMatchId) {
+        updateNextMatch(ss, bracketSheet, bracketData, loserNextMatchId, loserNextSlot, loserName);
+      }
+      break;
+    }
+  }
+
+  // (以下、MatchesとScoreInputの更新は既存コード通り)
+  if (rowIndexMatch > 0) {
+    matchesSheet.getRange(rowIndexMatch, 7).setValue('終了');
+  }
+  scoreInputSheet.getRange(rowIndexInput, 2, 1, 5).setValues([[0, 0, "", "終了", "NG"]]);
+
+  return createJsonResponse({"success": true, "message": "Match refined and teams propagated."});
+}
+
+function updateNextMatch(ss, sheet, data, matchId, slot, teamName) {
+  for (var j = 1; j < data.length; j++) {
+    if (data[j][0] === matchId) {
+      var colIndex = slot === 'A' ? 5 : 6; // E: チームA, F: チームB
+      sheet.getRange(j + 1, colIndex).setValue(teamName);
+      break;
+    }
+  }
 }
 
 function setPermission(ss, params) {
