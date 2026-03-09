@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VolleyManager | Admin</title>
+  <link rel="stylesheet" href="../css/index.css">
+</head>
+
+<body>
+  <div class="container">
+    <header style="margin-bottom: 2rem; border-bottom: 5px solid #000;">
+      <h1>管理パネル</h1>
+      <p>各コートのステータスおよび入力許可設定</p>
+    </header>
+
+    <div id="admin-grid" class="grid-6">
+      <!-- Admin cards -->
+    </div>
+  </div>
+
+  <script src="../js/common.js"></script>
+  <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxIPOAT9PH96GssZTJrcHTe6rudJe531hfmMccHHjPXATSlxcjDrvYKiO1jbCufzEv-iA/exec';
+    const api = new VolleyAPI(API_URL);
+
+    async function updateAdmin() {
+      const matches = await api.fetchSheet('Matches');
+      const scores = await api.fetchSheet('ScoreInput');
+      const grid = document.getElementById('admin-grid');
+
+      grid.innerHTML = matches.map(m => {
+        const s = scores.find(score => score.コート番号 == m.コート番号) || {};
+        const isPermitted = s.操作許可 === 'OK';
+
+        return `
+          <div class="card">
+            <div class="card-header">
+              <span class="label">第 ${m.コート番号} コート</span>
+              <span class="status-tag">${m.状況}</span>
+            </div>
+            <div style="margin-bottom: 1rem;">
+              <div style="font-weight: 700;">${m.チームA || '---'} vs ${m.チームB || '---'}</div>
+              <div style="font-family: 'Roboto Mono'; font-size: 1.5rem;">${m.チームA得点 || 0} - ${m.チームB得点 || 0}</div>
+            </div>
+            
+            <div style="display: grid; gap: 0.5rem;">
+              <button onclick="togglePerm(${m.コート番号}, '${isPermitted ? 'NG' : 'OK'}')" 
+                      style="background: ${isPermitted ? '#000' : '#fff'}; color: ${isPermitted ? '#fff' : '#000'}; border: 2px solid #000; padding: 0.5rem; font-weight: 900; cursor: pointer;">
+                ${isPermitted ? '入力をロック' : '入力を許可'}
+              </button>
+              
+              <button onclick="finishMatch(${m.コート番号})" 
+                      style="background: #fff; color: #000; border: 2px solid #000; padding: 0.5rem; font-weight: 900; cursor: pointer;"
+                      ${m.状況 !== '試合中' ? 'disabled style="opacity:0.3"' : ''}>
+                試合終了を確定
+              </button>
+
+              <a href="../score.html?court=${m.コート番号}" target="_blank" style="text-align: center; font-size: 0.8rem; color: #666;">入力ページを開く</a>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function togglePerm(court, perm) {
+      if (!confirm(`第 ${court} コート: 入力許可を ${perm} に変更しますか？`)) return;
+      await api.postAction('setPermission', { court, permission: perm });
+      alert('更新しました。（※反映に数秒かかる場合があります）');
+      setTimeout(updateAdmin, 1000);
+    }
+
+    async function finishMatch(court) {
+      if (!confirm(`第 ${court} コート: 試合を終了し、勝敗を確定させますか？`)) return;
+      await api.postAction('finishMatch', { court });
+      alert('試合を終了しました。勝敗がトーナメント表に反映されます。');
+      setTimeout(updateAdmin, 1000);
+    }
+
+    updateAdmin();
+    setInterval(updateAdmin, 5000);
+  </script>
+</body>
+
+</html>

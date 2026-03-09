@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VolleyManager | OverView</title>
+  <link rel="stylesheet" href="css/index.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Roboto+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+</head>
+
+<body>
+  <div class="container">
+    <header style="border-bottom: var(--border-width) solid #000; margin-bottom: 3rem; padding-bottom: 1rem;">
+      <h1>VolleyMatch <span style="font-weight: 400; opacity: 0.5;">2026</span></h1>
+      <p style="text-transform: uppercase; font-weight: 700; font-size: 0.875rem;">コート別 進行状況一覧</p>
+    </header>
+
+    <div id="court-grid" class="grid-6">
+      <!-- Cards will be injected here -->
+      <div class="card" style="opacity: 0.5; border-style: dashed;">
+        <p>読み込み中...</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/common.js"></script>
+  <script>
+    // Replace with actual GAS URL
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxIPOAT9PH96GssZTJrcHTe6rudJe531hfmMccHHjPXATSlxcjDrvYKiO1jbCufzEv-iA/exec';
+    const api = new VolleyAPI(API_URL);
+
+    async function updateOverview() {
+      const matches = await api.fetchSheet('Matches');
+      const grid = document.getElementById('court-grid');
+
+      if (!matches || matches.length === 0) return;
+
+      grid.innerHTML = matches.map(m => {
+        const isFinished = m.状況 === '終了';
+        const minsSince = getMinutesSince(m.終了時刻);
+        const showFinished = isFinished && minsSince < 5;
+
+        let statusText = m.状況;
+        let cardClass = "card";
+
+        if (showFinished) {
+          statusText = "試合終了";
+        } else if (isFinished && minsSince >= 5) {
+          statusText = "次の試合待ち";
+        } else if (m.状況 === '試合中') {
+          cardClass += " highlight-animated";
+        }
+
+        return `
+          <div class="${cardClass}" onclick="location.href='bracket.html?court=${m.コート番号}'" style="cursor: pointer;">
+            <div class="card-header">
+              <span class="label">第 ${m.コート番号} コート</span>
+              <span class="status-tag">${statusText}</span>
+            </div>
+            <div class="match-content">
+              <div class="score-row">
+                <span class="team-name">${m.チームA || '---'}</span>
+                <span class="score-value">${m.チームA得点 || 0}</span>
+              </div>
+              <div class="score-row">
+                <span class="team-name">${m.チームB || '---'}</span>
+                <span class="score-value">${m.チームB得点 || 0}</span>
+              </div>
+            </div>
+            <div style="margin-top: 1rem; border-top: var(--border-width-thin) solid #000; padding-top: 0.5rem; font-size: 0.8rem; font-weight: 700;">
+              審判: ${m.審判 || '未定'}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Poll every 5 seconds
+    setInterval(updateOverview, 5000);
+    updateOverview();
+  </script>
+</body>
+
+</html>

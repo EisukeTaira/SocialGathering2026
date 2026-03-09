@@ -7,9 +7,9 @@
 ## 📊 シート1: `Matches`（リアルタイム試合状況）
 **役割**: トップページ（`index.html`）と個別コートページ（`court.html`）に表示する「現在の進行状況」を管理します。
 
-| A: コート番号 | B: チームA | C: チームB | D: チームA得点 | E: チームB得点 | F: 審判 | G: 状況 |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **説明** | 何番コートか | 左側のチーム | Aの現在の点 | Bの現在の点 | 審判担当 | 現在の状態 |
+| A: コート番号 | B: チームA | C: チームB | D: チームA得点 | E: チームB得点 | F: 審判 | G: 状況 | H: 終了時刻 |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **説明** | 何番コートか | 左側のチーム | Aの現在の点 | Bの現在の点 | 審判担当 | 現在の状態 | 試合終了時刻 |
 | **入力例** | 1 | Aチーム | 21 | 15 | Cチーム | 試合中 |
 
 > [!NOTE]
@@ -169,19 +169,17 @@ function finishMatch(ss, params) {
     if (bracketData[i][4] === teamA && bracketData[i][5] === teamB) {
       bracketSheet.getRange(i + 1, 7, 1, 3).setValues([[scoreA, scoreB, winnerName]]);
       
-      // 次の試合へ勝利者を送る
+      // 次の試合へ勝ち進む
       var nextMatchId = bracketData[i][9]; // J: 次の試合ID
       var nextSlot = bracketData[i][10];   // K: 次の試合スロット (A or B)
-      
       if (nextMatchId) {
         updateNextMatch(ss, bracketSheet, bracketData, nextMatchId, nextSlot, winnerName);
       }
 
-      // 次の試合へ敗者を送る
+      // 敗者同士の試合へ
       var loserName = scoreA > scoreB ? teamB : teamA;
       var loserNextMatchId = bracketData[i][11]; // L: 敗者進む先のID
       var loserNextSlot = bracketData[i][12];    // M: 敗者進むスロット (A or B)
-
       if (loserNextMatchId) {
         updateNextMatch(ss, bracketSheet, bracketData, loserNextMatchId, loserNextSlot, loserName);
       }
@@ -189,13 +187,13 @@ function finishMatch(ss, params) {
     }
   }
 
-  // (以下、MatchesとScoreInputの更新は既存コード通り)
+  // (MatchesとScoreInputの更新)
   if (rowIndexMatch > 0) {
-    matchesSheet.getRange(rowIndexMatch, 7).setValue('終了');
+    matchesSheet.getRange(rowIndexMatch, 7, 1, 2).setValues([['終了', new Date()]]);
   }
   scoreInputSheet.getRange(rowIndexInput, 2, 1, 5).setValues([[0, 0, "", "終了", "NG"]]);
 
-  return createJsonResponse({"success": true, "message": "Match refined and teams propagated."});
+  return createJsonResponse({"success": true, "message": "Match finished. Status set to 'Finished' for 5 minutes."});
 }
 
 function updateNextMatch(ss, sheet, data, matchId, slot, teamName) {
