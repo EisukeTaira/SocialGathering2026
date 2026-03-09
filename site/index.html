@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match Overview - SocialGathering2026</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>COURT OVERVIEW</h1>
+        <p style="font-weight: 800; opacity: 0.6; margin-top: 10px;">REAL-TIME MATCH STATUS</p>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html" class="nav-link active">Overview</a>
+            <a href="bracket.html?court=1" class="nav-link">Tournament</a>
+            <a href="admin.html" class="nav-link">Admin</a>
+        </nav>
+
+        <div id="courtGrid" class="court-grid">
+            <!-- コート情報がJavaScriptで動的に追加されます -->
+            <div style="grid-column: 1/-1; text-align: center; padding: 100px;">
+                <p style="font-weight: 900; font-size: 1.5rem;">LOADING DATA...</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2026 SOCIAL GATHERING VOLLEYBALL TOURNAMENT
+    </footer>
+
+    <script src="gas-api.js"></script>
+    <script>
+        const courtGrid = document.getElementById('courtGrid');
+
+        async function updateOverview() {
+            const data = await fetchMatches('Matches');
+            if (!data) return;
+
+            courtGrid.innerHTML = '';
+            
+            // コート1〜6の順に表示
+            for (let i = 1; i <= 6; i++) {
+                const courtData = data.find(m => String(m['コート番号']) === String(i)) || {
+                    'コート番号': i,
+                    'チームA': '-',
+                    'チームB': '-',
+                    'スコア': '0 - 0',
+                    '審判': '-',
+                    '状況': '準備中'
+                };
+
+                const card = document.createElement('div');
+                card.className = 'court-card';
+                card.onclick = () => window.location.href = `court.html?court=${i}`;
+                
+                card.innerHTML = `
+                    <div class="court-number">${i}</div>
+                    <div class="status-badge">${courtData['状況']}</div>
+                    <h2 style="font-weight: 900; font-size: 1.5rem;">COURT ${i}</h2>
+                    
+                    <div class="teams-display">
+                        <div class="team-box">
+                            <span>${courtData['チームA']}</span>
+                        </div>
+                        <div class="score-display">
+                            ${courtData['スコア']}
+                        </div>
+                        <div class="team-box">
+                            <span>${courtData['チームB']}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="referee-info">
+                        <span style="font-size: 0.7rem; border: 1px solid #000; padding: 2px 4px;">REF</span>
+                        ${courtData['審判']}
+                    </div>
+                `;
+                courtGrid.appendChild(card);
+            }
+        }
+
+        // 初回実行と定期更新
+        updateOverview();
+        setInterval(updateOverview, 5000);
+    </script>
+</body>
+</html>

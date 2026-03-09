@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Court Detail - SocialGathering2026</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .court-detail-view {
+            text-align: center;
+            padding-top: 40px;
+        }
+        .huge-number {
+            font-size: 10rem;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 20px;
+            opacity: 0.1;
+            position: absolute;
+            width: 100%;
+            z-index: -1;
+        }
+        .score-box-large {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            margin: 60px 0;
+        }
+        .team-name-large {
+            font-size: 3.5rem;
+            font-weight: 900;
+            flex: 1;
+            text-transform: uppercase;
+        }
+        .score-val-large {
+            font-size: 8rem;
+            font-weight: 900;
+            background: var(--text-color);
+            color: var(--bg-color);
+            padding: 20px 40px;
+            border: 8px solid var(--border-color);
+            min-width: 250px;
+        }
+        .ref-box-large {
+            border: 4px solid var(--border-color);
+            padding: 20px;
+            display: inline-block;
+            margin-top: 40px;
+            font-weight: 800;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1 id="courtTitle">COURT DETAIL</h1>
+        <div class="nav-links" style="margin-top: 20px;">
+            <a href="index.html" class="nav-link">← Overview</a>
+        </div>
+    </header>
+
+    <div class="container court-detail-view">
+        <div class="huge-number" id="hugeNumber">-</div>
+        <div class="status-badge" id="statusBadge" style="font-size: 1.5rem; padding: 10px 30px;">-</div>
+        
+        <div class="score-box-large">
+            <div class="team-name-large" id="teamA">TEAM A</div>
+            <div class="score-val-large" id="scoreVal">0 - 0</div>
+            <div class="team-name-large" id="teamB">TEAM B</div>
+        </div>
+        
+        <div class="ref-box-large">
+            <p style="font-size: 0.8rem; opacity: 0.5; margin-bottom: 5px;">REFEREE TEAM</p>
+            <div id="referee" style="font-size: 2rem;">-</div>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2026 SOCIAL GATHERING VOLLEYBALL TOURNAMENT
+    </footer>
+
+    <script src="gas-api.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const courtId = urlParams.get('court') || '1';
+
+        async function updateCourt() {
+            const data = await fetchMatches('Matches');
+            if (!data) return;
+
+            const courtData = data.find(m => String(m['コート番号']) === String(courtId));
+            if (!courtData) return;
+
+            document.title = `Court ${courtId} - Detail`;
+            document.getElementById('courtTitle').innerText = `COURT ${courtId}`;
+            document.getElementById('hugeNumber').innerText = courtId;
+            document.getElementById('statusBadge').innerText = courtData['状況'];
+            document.getElementById('teamA').innerText = courtData['チームA'];
+            document.getElementById('teamB').innerText = courtData['チームB'];
+            document.getElementById('scoreVal').innerText = courtData['スコア'];
+            document.getElementById('referee').innerText = courtData['審判'];
+        }
+
+        updateCourt();
+        setInterval(updateCourt, 3000); // 3秒更新
+    </script>
+</body>
+</html>

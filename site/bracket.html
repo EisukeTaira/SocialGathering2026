@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournament Bracket - SocialGathering2026</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* トーナメント専用の追加スタイル */
+        .bracket-container {
+            display: flex;
+            flex-direction: column-reverse; /* 下から上へ */
+            align-items: center;
+            gap: 80px;
+            padding: 60px 20px;
+            overflow-x: auto;
+            min-height: 80vh;
+            position: relative;
+        }
+
+        .round {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            width: 100%;
+            position: relative;
+            z-index: 10;
+        }
+
+        .round-label {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%) rotate(-90deg);
+            font-weight: 900;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            opacity: 0.3;
+        }
+
+        .match-box {
+            width: 220px;
+            border: 4px solid var(--border-color);
+            background: white;
+            padding: 10px;
+            position: relative;
+            box-shadow: 8px 8px 0 rgba(0,0,0,0.1);
+        }
+
+        .match-box.active {
+            background-color: var(--highlight-bg);
+        }
+
+        .match-id {
+            position: absolute;
+            top: -12px;
+            left: -12px;
+            background: var(--text-color);
+            color: var(--bg-color);
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            font-weight: 900;
+        }
+
+        .team-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 35px;
+            padding: 0 8px;
+            font-weight: 800;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .team-row:last-child {
+            border-bottom: none;
+        }
+
+        .team-row.winner {
+            background: var(--text-color);
+            color: var(--bg-color);
+        }
+
+        .match-score {
+            font-family: monospace;
+            font-weight: 900;
+        }
+
+        /* SVG コネクタレイヤー */
+        #connectorLayer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .connector-line {
+            fill: none;
+            stroke: var(--border-color);
+            stroke-width: 3;
+        }
+
+        /* エントリーリスト（最下部） */
+        .entries-section {
+            margin-top: 100px;
+            border-top: 4px dashed #ccc;
+            padding-top: 40px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .entry-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .entry-card {
+            padding: 10px 20px;
+            border: 2px solid var(--border-color);
+            font-weight: 800;
+            font-size: 0.85rem;
+            background: #fff;
+        }
+
+        .court-nav {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .court-select-btn {
+            padding: 10px 20px;
+            border: 2px solid var(--border-color);
+            text-decoration: none;
+            color: inherit;
+            font-weight: 900;
+            font-size: 0.8rem;
+        }
+
+        .court-select-btn.active {
+            background: var(--text-color);
+            color: var(--bg-color);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1 id="bracketTitle">TOURNAMENT BRACKET</h1>
+        <p style="font-weight: 800; opacity: 0.6; margin-top: 10px;">VERTICAL UPWARD VIEW</p>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html" class="nav-link">Overview</a>
+            <a href="bracket.html?court=1" class="nav-link active">Tournament</a>
+            <a href="admin.html" class="nav-link">Admin</a>
+        </nav>
+
+        <div class="court-nav">
+            <a href="?court=1" id="cbtn_1" class="court-select-btn">COURT 1</a>
+            <a href="?court=2" id="cbtn_2" class="court-select-btn">COURT 2</a>
+            <a href="?court=3" id="cbtn_3" class="court-select-btn">COURT 3</a>
+            <a href="?court=4" id="cbtn_4" class="court-select-btn">COURT 4</a>
+            <a href="?court=5" id="cbtn_5" class="court-select-btn">COURT 5</a>
+            <a href="?court=6" id="cbtn_6" class="court-select-btn">COURT 6</a>
+        </div>
+
+        <main class="bracket-container" id="bracketContent">
+            <svg id="connectorLayer"></svg>
+            <div style="text-align: center; padding: 100px;">
+                <p style="font-weight: 900; font-size: 1.5rem;">LOADING BRACKET...</p>
+            </div>
+        </main>
+
+        <div class="entries-section">
+            <h3 style="font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em;">Team Entries</h3>
+            <div id="entryGrid" class="entry-grid">
+                <!-- エントリーリストがJavaScriptで追加されます -->
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2026 SOCIAL GATHERING VOLLEYBALL TOURNAMENT
+    </footer>
+
+    <script src="gas-api.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentCourt = urlParams.get('court') || '1';
+        const bracketContent = document.getElementById('bracketContent');
+        const entryGrid = document.getElementById('entryGrid');
+        const svg = document.getElementById('connectorLayer');
+
+        document.getElementById(`cbtn_${currentCourt}`)?.classList.add('active');
+        document.getElementById('bracketTitle').innerText = `TOURNAMENT - COURT ${currentCourt}`;
+
+        async function initTournament() {
+            const [bracketData, teamsData] = await Promise.all([
+                fetchMatches('Bracket'),
+                fetchMatches('Teams').catch(() => [])
+            ]);
+
+            if (!bracketData) return;
+
+            const courtMatches = bracketData.filter(m => String(m['コート番号']) === currentCourt);
+            const courtTeams = (teamsData || []).filter(t => String(t['コート番号']) === currentCourt);
+
+            // エントリーリスト描画
+            entryGrid.innerHTML = '';
+            courtTeams.forEach(t => {
+                const div = document.createElement('div');
+                div.className = 'entry-card';
+                div.innerText = t['チーム名'];
+                entryGrid.appendChild(div);
+            });
+
+            if (courtMatches.length === 0) {
+                bracketContent.innerHTML = '<div style="padding: 100px; font-weight: 800;">No tournament data found for this court.</div>';
+                return;
+            }
+
+            // 勝者反映ロジック
+            const matchMap = {};
+            courtMatches.forEach(m => matchMap[m['ID']] = {...m});
+            courtMatches.forEach(m => {
+                const win = String(m['勝者ID'] || '').trim().toUpperCase();
+                const nextId = String(m['次の試合ID'] || '').trim();
+                const nextSlot = String(m['次の試合スロット'] || '').trim().toUpperCase();
+                if (win && nextId && matchMap[nextId]) {
+                    const winnerName = (win === 'A') ? m['チームA'] : (win === 'B' ? m['チームB'] : '');
+                    if (nextSlot === 'A') matchMap[nextId]['チームA'] = winnerName;
+                    if (nextSlot === 'B') matchMap[nextId]['チームB'] = winnerName;
+                }
+            });
+
+            // ラウンド分け
+            const rounds = {};
+            Object.values(matchMap).forEach(m => {
+                const r = m['ラウンド'] || '予選';
+                if (!rounds[r]) rounds[r] = [];
+                rounds[r].push(m);
+            });
+
+            // 描画
+            bracketContent.innerHTML = '<svg id="connectorLayer"></svg>';
+            const svgLayer = document.getElementById('connectorLayer');
+
+            Object.keys(rounds).forEach(rn => {
+                const rDiv = document.createElement('div');
+                rDiv.className = 'round';
+                
+                const label = document.createElement('div');
+                label.className = 'round-label';
+                label.innerText = rn;
+                rDiv.appendChild(label);
+
+                rounds[rn].sort((a,b) => (Number(a['試合順']) || 0) - (Number(b['試合順']) || 0));
+
+                rounds[rn].forEach(m => {
+                    const win = String(m['勝者ID'] || '').trim().toUpperCase();
+                    const score = String(m['スコア'] || '');
+                    const [sA, sB] = score.includes('-') ? score.split('-') : ['', ''];
+
+                    const box = document.createElement('div');
+                    box.className = `match-box ${score && !win ? 'active' : ''}`;
+                    box.id = `match-${m['ID']}`;
+                    box.innerHTML = `
+                        <div class="match-id">${m['ID']}</div>
+                        <div class="team-row ${win === 'A' ? 'winner' : ''}">
+                            <span>${m['チームA'] || '<span style="opacity:0.3">TBD</span>'}</span>
+                            <span class="match-score">${sA}</span>
+                        </div>
+                        <div class="team-row ${win === 'B' ? 'winner' : ''}">
+                            <span>${m['チームB'] || '<span style="opacity:0.3">TBD</span>'}</span>
+                            <span class="match-score">${sB}</span>
+                        </div>
+                    `;
+                    rDiv.appendChild(box);
+                });
+                bracketContent.appendChild(rDiv);
+            });
+
+            // 線を引く (座標確定のため少し遅延)
+            setTimeout(() => drawLines(Object.values(matchMap), svgLayer), 200);
+        }
+
+        function drawLines(matches, svg) {
+            svg.innerHTML = '';
+            const rect = bracketContent.getBoundingClientRect();
+            
+            matches.forEach(m => {
+                const nextId = String(m['次の試合ID'] || '').trim();
+                const fromEl = document.getElementById(`match-${m['ID']}`);
+                const toEl = document.getElementById(`match-${nextId}`);
+
+                if (fromEl && toEl) {
+                    const fRect = fromEl.getBoundingClientRect();
+                    const tRect = toEl.getBoundingClientRect();
+
+                    const startX = fRect.left + fRect.width / 2 - rect.left;
+                    const startY = fRect.top - rect.top; // 上端から出る
+                    const endX = tRect.left + tRect.width / 2 - rect.left;
+                    const endY = tRect.bottom - rect.top; // 下端に入る
+
+                    const midY = startY - (startY - endY) / 2;
+
+                    const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    p.setAttribute("d", `M ${startX} ${startY} L ${startX} ${midY} L ${endX} ${midY} L ${endX} ${endY}`);
+                    p.setAttribute("class", "connector-line");
+                    svg.appendChild(p);
+                }
+            });
+        }
+
+        initTournament();
+        window.addEventListener('resize', () => {
+            // リサイズ時に線を再描画
+            const svgLayer = document.getElementById('connectorLayer');
+            fetchMatches('Bracket').then(data => {
+                if(data) drawLines(data, svgLayer);
+            });
+        });
+        setInterval(initTournament, 20000);
+    </script>
+</body>
+</html>

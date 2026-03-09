@@ -1,0 +1,175 @@
+/* 
+  SocialGathering2026 - Premium Monochrome Design System
+*/
+
+:root {
+  --bg-color: #ffffff;
+  --text-color: #000000;
+  --accent-color: #333333;
+  --border-color: #000000;
+  --highlight-bg: #fdfdf0; /* 淡いイエローベージュ（試合中などのアクセント） */
+  --muted-text: #666666;
+  --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: var(--font-main);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+header {
+  padding: 40px 20px;
+  text-align: center;
+  border-bottom: 8px solid var(--border-color);
+  margin-bottom: 40px;
+}
+
+h1 {
+  font-size: 3rem;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  text-transform: uppercase;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* 共通ナビゲーション */
+nav {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.nav-link {
+  color: var(--text-color);
+  text-decoration: none;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  padding: 8px 16px;
+  border: 2px solid var(--border-color);
+  transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+  background-color: var(--text-color);
+  color: var(--bg-color);
+}
+
+.nav-link.active {
+  background-color: var(--text-color);
+  color: var(--bg-color);
+}
+
+/* カードレイアウト（Overview用） */
+.court-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 30px;
+  margin-bottom: 60px;
+}
+
+.court-card {
+  border: 4px solid var(--border-color);
+  padding: 20px;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: white;
+}
+
+.court-card:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: 8px 8px 0 var(--border-color);
+}
+
+.court-number {
+  font-size: 5rem;
+  font-weight: 900;
+  position: absolute;
+  top: -10px;
+  right: 10px;
+  opacity: 0.05;
+  pointer-events: none;
+}
+
+.match-info {
+  margin-top: 10px;
+}
+
+.teams-display {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.team-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border: 2px solid var(--border-color);
+  font-weight: 900;
+  font-size: 1.2rem;
+}
+
+.score-display {
+  background: var(--text-color);
+  color: var(--bg-color);
+  padding: 10px 20px;
+  font-size: 2rem;
+  font-weight: 900;
+  text-align: center;
+  margin-top: 15px;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  background: var(--text-color);
+  color: var(--bg-color);
+  font-weight: 900;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.referee-info {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--muted-text);
+  margin-top: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* フッター */
+footer {
+  text-align: center;
+  padding: 60px 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  opacity: 0.5;
+}
+
+/* レスポンシブ */
+@media (max-width: 768px) {
+  h1 { font-size: 2rem; }
+  .court-grid { grid-template-columns: 1fr; }
+}
