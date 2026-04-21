@@ -315,6 +315,7 @@ function bindEvents() {
   document.addEventListener('click', (event) => {
     const routeTrigger = event.target.closest('[data-route]');
     if (routeTrigger) {
+      event.preventDefault();
       const nextCourt = routeTrigger.getAttribute('data-select-court');
       if (nextCourt) {
         updateSelectedCourt(nextCourt);
