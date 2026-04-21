@@ -22,9 +22,13 @@
 .tab-row__button {
   padding: 0.95rem 1rem;
   border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: rgba(255, 255, 255, 0.62);
   color: var(--color-muted);
   box-shadow: inset 0 0 0 1px rgba(29, 36, 51, 0.08);
+  text-decoration: none;
 }
 
 .site-nav__label {
@@ -61,6 +65,25 @@
   background: rgba(255, 255, 255, 0.72);
 }
 
+.hero-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.hero-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--color-accent-deep);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
 .summary-card__label,
 .court-card__label,
 .schedule-slot__meta,
@@ -95,6 +118,10 @@
   font-size: 2rem;
 }
 
+.summary-card--accent {
+  background: linear-gradient(135deg, rgba(233, 180, 76, 0.2), rgba(255, 255, 255, 0.88));
+}
+
 .schedule-strip {
   display: grid;
   grid-auto-flow: column;
@@ -117,6 +144,10 @@
 .schedule-note-list__item {
   margin: 0;
   color: var(--color-muted);
+}
+
+.schedule-strip--dashboard .schedule-slot {
+  padding: 0.85rem 0.9rem;
 }
 
 .court-card {
@@ -168,6 +199,15 @@
   display: block;
   margin-top: 0.3rem;
   font-size: 0.85rem;
+}
+
+.court-card__match {
+  line-height: 1.55;
+  word-break: break-word;
+}
+
+.court-card__meta {
+  line-height: 1.55;
 }
 
 .court-card__countdown {
@@ -504,5 +544,47 @@
 
   .table-shell--desktop-only {
     display: block;
+  }
+}
+
+@media (max-width: 39.9375rem) {
+  .summary-grid--dashboard {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .summary-grid--dashboard .summary-card:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .schedule-strip--dashboard {
+    grid-auto-columns: minmax(6.5rem, 1fr);
+    gap: 0.65rem;
+  }
+
+  .schedule-note-list {
+    gap: 0.5rem;
+  }
+
+  .schedule-note-list__item {
+    padding: 0.7rem 0.8rem;
+    border-radius: 0.8rem;
+    background: rgba(255, 255, 255, 0.64);
+  }
+
+  .court-grid--dashboard {
+    gap: 0.85rem;
+  }
+
+  .court-card {
+    gap: 0.85rem;
+    padding: 0.95rem;
+  }
+
+  .court-card__header {
+    gap: 0.6rem;
+  }
+
+  .court-card__link {
+    padding-top: 0.1rem;
   }
 }

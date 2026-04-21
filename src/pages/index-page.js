@@ -51,6 +51,7 @@ export function renderIndexPage(state) {
   const { courts, matches, scheduleOverview, scheduleSlots } = state.data;
   const completedCount = matches.filter((match) => match.status === 'completed').length;
   const inProgressCount = matches.filter((match) => match.status === 'in_progress').length;
+  const scheduledCount = matches.filter((match) => match.status === 'scheduled').length;
   const eventNotes = scheduleOverview || [];
 
   return `
@@ -61,6 +62,11 @@ export function renderIndexPage(state) {
         <p class="page-hero__description">
           固定タイムテーブル、各コートの現在試合、次試合、入力受付状態をまとめて表示します。
         </p>
+        <div class="hero-chip-row">
+          <span class="hero-chip">進行中 ${inProgressCount}</span>
+          <span class="hero-chip">未開始 ${scheduledCount}</span>
+          <span class="hero-chip">受付 ${state.scoreInputEnabled ? 'ON' : 'OFF'}</span>
+        </div>
       </div>
       <aside class="hero-panel">
         <p class="hero-panel__label">運営メッセージ</p>
@@ -75,6 +81,7 @@ export function renderIndexPage(state) {
         '全コート共通の試合開始時刻です。Admin で変更するとここへ反映されます。'
       )}
       <div class="schedule-strip" role="list" aria-label="固定タイムテーブル">
+          <div class="schedule-strip schedule-strip--dashboard" role="list" aria-label="固定タイムテーブル">
         ${scheduleSlots
           .map(
             (slot, index) => `
@@ -119,6 +126,10 @@ export function renderIndexPage(state) {
         <article class="summary-card">
           <p class="summary-card__label">入力受付</p>
           <p class="summary-card__value">${state.scoreInputEnabled ? '受付中' : '停止中'}</p>
+        </article>
+        <article class="summary-card summary-card--accent">
+          <p class="summary-card__label">未開始試合</p>
+          <p class="summary-card__value">${scheduledCount}</p>
         </article>
       </div>
     </section>

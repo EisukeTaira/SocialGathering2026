@@ -39,24 +39,6 @@
   color: var(--color-muted);
 }
 
-.site-header__page-state {
-  margin: 0.45rem 0 0;
-  color: var(--color-accent-deep);
-  font-size: 0.95rem;
-  font-weight: 700;
-}
-
-.debug-banner {
-  margin: 0 0 1rem;
-  padding: 0.75rem 0.9rem;
-  border: 1px dashed rgba(217, 93, 57, 0.45);
-  border-radius: 0.85rem;
-  background: rgba(255, 245, 238, 0.92);
-  color: var(--color-accent-deep);
-  font-size: 0.9rem;
-  line-height: 1.6;
-}
-
 .site-main {
   display: grid;
   gap: 1.25rem;
@@ -172,5 +154,20 @@
 
   .admin-grid--secondary {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 39.9375rem) {
+  .page-hero--dashboard {
+    gap: 0.85rem;
+  }
+
+  .page-hero--dashboard .hero-panel {
+    align-self: stretch;
+    padding: 0.85rem 1rem;
+  }
+
+  .page-hero--dashboard .page-hero__title {
+    font-size: clamp(1.8rem, 7.5vw, 2.5rem);
   }
 }
