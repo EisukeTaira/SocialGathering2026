@@ -1,23 +1,27 @@
-import { renderNavigation } from '../components/navigation.js?v=20260421-04';
-import { regenerateCourtTournamentData } from '../data/mock-data.js?v=20260421-04';
-import { renderAdminPage } from '../pages/admin-page.js?v=20260421-04';
-import { renderIndexPage } from '../pages/index-page.js?v=20260421-04';
-import { renderScoreInputPage } from '../pages/score-input-page.js?v=20260421-04';
-import { renderTournamentPage } from '../pages/tournament-page.js?v=20260421-04';
-import { navigate, syncRouteFromHash } from './router.js?v=20260421-04';
-import { getState, setState, subscribe, updateData } from './store.js?v=20260421-04';
+import { renderNavigation } from '../components/navigation.js?v=20260421-05';
+import { regenerateCourtTournamentData } from '../data/mock-data.js?v=20260421-05';
+import { renderAdminPage } from '../pages/admin-page.js?v=20260421-05';
+import { renderIndexPage } from '../pages/index-page.js?v=20260421-05';
+import { renderScoreInputPage } from '../pages/score-input-page.js?v=20260421-05';
+import { renderTournamentPage } from '../pages/tournament-page.js?v=20260421-05';
+import {
+  ROUTES,
+  navigate,
+  syncRouteFromHash,
+} from './router.js?v=20260421-05';
+import { getState, setState, subscribe, updateData } from './store.js?v=20260421-05';
 
 const appElement = document.querySelector('#app');
 
 function renderCurrentPage(state) {
   switch (state.selectedPage) {
-    case 'tournament':
+    case ROUTES.tournament:
       return renderTournamentPage(state);
-    case 'score-input':
+    case ROUTES.scoreInput:
       return renderScoreInputPage(state);
-    case 'admin':
+    case ROUTES.admin:
       return renderAdminPage(state);
-    case 'index':
+    case ROUTES.index:
     default:
       return renderIndexPage(state);
   }
@@ -328,8 +332,8 @@ function bindEvents() {
     const courtTrigger = event.target.closest('[data-select-court]');
     if (courtTrigger) {
       updateSelectedCourt(courtTrigger.getAttribute('data-select-court'));
-      if (getState().selectedPage !== 'tournament') {
-        navigate('tournament');
+      if (getState().selectedPage !== ROUTES.tournament) {
+        navigate(ROUTES.tournament);
       }
       return;
     }
@@ -337,11 +341,11 @@ function bindEvents() {
     const editTrigger = event.target.closest('[data-admin-edit]');
     if (editTrigger) {
       setState({
-        selectedPage: 'admin',
+        selectedPage: ROUTES.admin,
         adminEditingMatchId: editTrigger.getAttribute('data-admin-edit'),
         adminMessage: '',
       });
-      navigate('admin');
+      navigate(ROUTES.admin);
       return;
     }
 

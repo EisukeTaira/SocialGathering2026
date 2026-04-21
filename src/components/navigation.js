@@ -1,8 +1,8 @@
+import { ROUTES } from '../app/router.js?v=20260421-05';
+
 const NAV_ITEMS = [
-  { id: 'index', label: 'Index', shortLabel: 'Index' },
-  { id: 'tournament', label: 'Tournament', shortLabel: '試合' },
-  { id: 'score-input', label: 'ScoreInput', shortLabel: '入力' },
-  { id: 'admin', label: 'Admin', shortLabel: '管理' },
+  { id: ROUTES.index, label: 'Index', shortLabel: 'Index' },
+  { id: ROUTES.tournament, label: 'Tournament', shortLabel: '試合' },
 ];
 
 export function renderNavigation(selectedPage) {

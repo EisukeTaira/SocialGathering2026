@@ -1,16 +1,31 @@
-import { getState, setState } from './store.js?v=20260421-04';
+import { getState, setState } from './store.js?v=20260421-05';
 
-const VALID_ROUTES = new Set(['index', 'tournament', 'score-input', 'admin']);
+export const ROUTES = {
+  index: 'index',
+  tournament: 'tournament',
+  scoreInput: 'ref-entry-2026',
+  admin: 'ops-room-2026',
+};
+
+const VALID_ROUTES = new Set(Object.values(ROUTES));
+
+export function isScoreInputRoute(routeName) {
+  return routeName === ROUTES.scoreInput;
+}
+
+export function isAdminRoute(routeName) {
+  return routeName === ROUTES.admin;
+}
 
 function parseHash() {
   const hash = window.location.hash.replace('#', '');
-  return VALID_ROUTES.has(hash) ? hash : 'index';
+  return VALID_ROUTES.has(hash) ? hash : ROUTES.index;
 }
 
 export function syncRouteFromHash() {
   if (!window.location.hash) {
-    window.location.hash = '#index';
-    setState({ selectedPage: 'index' });
+    window.location.hash = `#${ROUTES.index}`;
+    setState({ selectedPage: ROUTES.index });
     return;
   }
 
@@ -23,7 +38,7 @@ export function syncRouteFromHash() {
 }
 
 export function navigate(routeName) {
-  const route = VALID_ROUTES.has(routeName) ? routeName : 'index';
+  const route = VALID_ROUTES.has(routeName) ? routeName : ROUTES.index;
   const nextHash = `#${route}`;
 
   if (getState().selectedPage !== route) {
