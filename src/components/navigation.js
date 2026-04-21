@@ -1,5 +1,5 @@
 const NAV_ITEMS = [
-  { id: 'index', label: 'Index', shortLabel: 'ホーム' },
+  { id: 'index', label: 'Index', shortLabel: 'Index' },
   { id: 'tournament', label: 'Tournament', shortLabel: '試合' },
   { id: 'score-input', label: 'ScoreInput', shortLabel: '入力' },
   { id: 'admin', label: 'Admin', shortLabel: '管理' },

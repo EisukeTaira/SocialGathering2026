@@ -8,6 +8,11 @@ function parseHash() {
 }
 
 export function syncRouteFromHash() {
+  if (!window.location.hash) {
+    window.location.hash = 'index';
+    return;
+  }
+
   const selectedPage = parseHash();
   const state = getState();
 

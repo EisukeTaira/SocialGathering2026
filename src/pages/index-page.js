@@ -43,7 +43,7 @@ export function renderIndexPage(state) {
   return `
     <section class="page-hero page-hero--dashboard">
       <div>
-        <p class="page-hero__eyebrow">Volleyball Tournament Dashboard</p>
+        <p class="page-hero__eyebrow">Index Page / Tournament Dashboard</p>
         <h1 class="page-hero__title">大会全体の進行を一画面で確認</h1>
         <p class="page-hero__description">
           固定タイムテーブル、各コートの現在試合、次試合、入力受付状態をまとめて表示します。
