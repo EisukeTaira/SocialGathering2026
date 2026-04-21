@@ -35,7 +35,15 @@ function getRemainingText(nextMatch) {
   return '開始時刻を過ぎています';
 }
 
-function buildCourtSummary(court, matches) {
+function getNextScheduleSlot(scheduleSlots) {
+  const now = new Date();
+  return scheduleSlots.find((slot) => {
+    const scheduledDate = parseTodayTime(slot);
+    return scheduledDate && scheduledDate >= now;
+  }) || scheduleSlots[0] || '--:--';
+}
+
+function buildCourtSummary(matches) {
   const currentMatch =
     matches.find((match) => match.status === 'in_progress') ||
     matches.find((match) => match.status === 'scheduled') ||
@@ -53,6 +61,7 @@ export function renderIndexPage(state) {
   const inProgressCount = matches.filter((match) => match.status === 'in_progress').length;
   const scheduledCount = matches.filter((match) => match.status === 'scheduled').length;
   const eventNotes = scheduleOverview || [];
+  const nextScheduleSlot = getNextScheduleSlot(scheduleSlots);
 
   return `
     <section class="page-hero page-hero--dashboard">
@@ -66,6 +75,16 @@ export function renderIndexPage(state) {
           <span class="hero-chip">進行中 ${inProgressCount}</span>
           <span class="hero-chip">未開始 ${scheduledCount}</span>
           <span class="hero-chip">受付 ${state.scoreInputEnabled ? 'ON' : 'OFF'}</span>
+        </div>
+        <div class="dashboard-priority-grid" aria-label="優先確認情報">
+          <article class="dashboard-priority-card">
+            <p class="dashboard-priority-card__label">次の一斉開始</p>
+            <p class="dashboard-priority-card__value">${nextScheduleSlot}</p>
+          </article>
+          <article class="dashboard-priority-card">
+            <p class="dashboard-priority-card__label">終了試合</p>
+            <p class="dashboard-priority-card__value">${completedCount}</p>
+          </article>
         </div>
       </div>
       <aside class="hero-panel">
@@ -98,7 +117,10 @@ export function renderIndexPage(state) {
             ${eventNotes
               .map(
                 (item) => `
-                  <p class="schedule-note-list__item">${item.time} | ${item.label}</p>
+                  <p class="schedule-note-list__item">
+                    <span class="schedule-note-list__time">${item.time}</span>
+                    <span class="schedule-note-list__text">${item.label}</span>
+                  </p>
                 `
               )
               .join('')}
@@ -143,7 +165,7 @@ export function renderIndexPage(state) {
         ${courts
           .map((court) => {
             const courtMatches = matches.filter((match) => match.courtId === court.id);
-            const { currentMatch, nextMatch } = buildCourtSummary(court, courtMatches);
+            const { currentMatch, nextMatch } = buildCourtSummary(courtMatches);
             const remainingMatchCount = courtMatches.filter(
               (match) => match.status === 'scheduled' || match.status === 'in_progress'
             ).length;
@@ -156,18 +178,15 @@ export function renderIndexPage(state) {
                 data-select-court="${court.id}"
               >
                 <span class="court-card__header">
-                  <span>
+                  <span class="court-card__summary">
                     <span class="court-card__eyebrow">${court.name}</span>
-                    <strong class="court-card__title">${court.assignedTeams.length}チーム所属</strong>
-                    <span class="court-card__submeta">残り${remainingMatchCount}試合</span>
+                    <strong class="court-card__title">現在 ${currentMatch ? `${currentMatch.teamA} vs ${currentMatch.teamB}` : '待機中'}</strong>
+                    <span class="court-card__submeta">${court.assignedTeams.length}チーム所属 / 残り${remainingMatchCount}試合</span>
                   </span>
                   ${renderStatusBadge(currentMatch?.status || 'scheduled')}
                 </span>
                 <span class="court-card__body">
-                  <span class="court-card__label">現在試合</span>
-                  <strong class="court-card__match">
-                    ${currentMatch ? `${currentMatch.teamA} vs ${currentMatch.teamB}` : '待機中'}
-                  </strong>
+                  <span class="court-card__label">現在試合の時刻</span>
                   <span class="court-card__meta">
                     ${currentMatch ? `${currentMatch.scheduledAt} / 第${currentMatch.order}試合` : '試合未登録'}
                   </span>

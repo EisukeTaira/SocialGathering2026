@@ -1,4 +1,4 @@
-import { getState, setState } from './store.js?v=20260421-02';
+import { getState, setState } from './store.js?v=20260421-03';
 
 const VALID_ROUTES = new Set(['index', 'tournament', 'score-input', 'admin']);
 
