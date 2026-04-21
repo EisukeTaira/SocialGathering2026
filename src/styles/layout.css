@@ -1,0 +1,128 @@
+.site-shell {
+  width: min(100%, 88rem);
+  margin: 0 auto;
+  padding: 1.5rem 1rem 4rem;
+}
+
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.site-header__eyebrow,
+.page-hero__eyebrow,
+.section-header__eyebrow,
+.court-card__eyebrow {
+  margin: 0;
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.08em;
+  color: var(--color-accent-deep);
+}
+
+.site-header__title,
+.page-hero__title,
+.section-header__title {
+  margin: 0;
+  line-height: 1;
+}
+
+.site-header__title {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+}
+
+.site-header__meta {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.site-main {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.page-hero,
+.surface-block {
+  background: var(--color-paper);
+  backdrop-filter: blur(1rem);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-soft);
+}
+
+.page-hero {
+  display: grid;
+  gap: 1rem;
+  padding: 1.5rem;
+}
+
+.page-hero__title {
+  font-size: clamp(2.2rem, 6vw, 4.75rem);
+}
+
+.page-hero__description,
+.section-header__description {
+  margin: 0.6rem 0 0;
+  max-width: 40rem;
+  color: var(--color-muted);
+  line-height: 1.8;
+}
+
+.hero-panel {
+  align-self: end;
+  padding: 1rem 1.15rem;
+  border-radius: var(--radius-medium);
+  background: linear-gradient(160deg, rgba(233, 180, 76, 0.2), rgba(217, 93, 57, 0.12));
+}
+
+.hero-panel.is-warning {
+  background: linear-gradient(160deg, rgba(201, 113, 42, 0.22), rgba(217, 93, 57, 0.1));
+}
+
+.hero-panel__label,
+.hero-panel__value,
+.section-header__eyebrow,
+.section-header__title {
+  margin: 0;
+}
+
+.hero-panel__label {
+  color: var(--color-muted);
+}
+
+.hero-panel__value {
+  margin-top: 0.25rem;
+  font-weight: 700;
+  line-height: 1.7;
+}
+
+.surface-block {
+  padding: 1.25rem;
+}
+
+.surface-block--stack {
+  display: grid;
+  gap: 1rem;
+}
+
+.section-header {
+  margin-bottom: 1rem;
+}
+
+.admin-grid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+@media (min-width: 48rem) {
+  .page-hero {
+    grid-template-columns: minmax(0, 1.7fr) minmax(18rem, 1fr);
+    align-items: end;
+  }
+
+  .admin-grid {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  }
+}

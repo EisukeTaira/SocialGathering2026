@@ -1,0 +1,28 @@
+.page-hero--dashboard {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(244, 239, 230, 0.84)),
+    radial-gradient(circle at right top, rgba(233, 180, 76, 0.3), transparent 26%);
+}
+
+.page-hero--tournament {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(237, 245, 247, 0.86)),
+    radial-gradient(circle at right top, rgba(142, 202, 230, 0.34), transparent 24%);
+}
+
+.page-hero--score-input {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(249, 246, 241, 0.86)),
+    radial-gradient(circle at right top, rgba(217, 93, 57, 0.18), transparent 24%);
+}
+
+.page-hero--admin {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 241, 232, 0.9)),
+    radial-gradient(circle at right top, rgba(217, 93, 57, 0.24), transparent 24%);
+}
+
+.form-surface {
+  display: grid;
+  gap: 1rem;
+}

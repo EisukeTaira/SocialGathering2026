@@ -1,0 +1,58 @@
+:root {
+  --color-sand: #f4efe6;
+  --color-paper: rgba(255, 250, 243, 0.86);
+  --color-ink: #1d2433;
+  --color-muted: #677184;
+  --color-accent: #d95d39;
+  --color-accent-deep: #9f2f17;
+  --color-gold: #e9b44c;
+  --color-sky: #8ecae6;
+  --color-border: rgba(29, 36, 51, 0.12);
+  --color-success: #2a7f62;
+  --color-warning: #c9712a;
+  --shadow-soft: 0 1.25rem 2.5rem rgba(38, 35, 35, 0.12);
+  --radius-large: 1.5rem;
+  --radius-medium: 1rem;
+  --radius-small: 0.75rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: 'Noto Sans JP', sans-serif;
+  color: var(--color-ink);
+  background:
+    radial-gradient(circle at top left, rgba(233, 180, 76, 0.3), transparent 24%),
+    radial-gradient(circle at top right, rgba(142, 202, 230, 0.35), transparent 20%),
+    linear-gradient(160deg, #f6efe4 0%, #f9f6f1 45%, #edf5f7 100%);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 0.2rem solid rgba(217, 93, 57, 0.3);
+  outline-offset: 0.15rem;
+}
+
+a {
+  color: inherit;
+}
