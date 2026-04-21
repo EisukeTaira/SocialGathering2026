@@ -1,5 +1,27 @@
 import { renderSectionTitle, renderStatusBadge } from '../components/ui.js';
 
+function parseTodayTime(timeText) {
+  const [hours, minutes] = timeText.split(':').map(Number);
+  const date = new Date();
+  date.setHours(hours, minutes, 0, 0);
+  return date;
+}
+
+function getRemainingText(nextMatch) {
+  if (!nextMatch) {
+    return '次試合未登録';
+  }
+
+  const diffMinutes = Math.round((parseTodayTime(nextMatch.scheduledAt) - new Date()) / 60000);
+  if (diffMinutes > 0) {
+    return `開始まであと${diffMinutes}分`;
+  }
+  if (diffMinutes === 0) {
+    return 'まもなく開始';
+  }
+  return '開始時刻を過ぎています';
+}
+
 function buildCourtSummary(court, matches) {
   const currentMatch =
     matches.find((match) => match.status === 'in_progress') ||
@@ -72,7 +94,7 @@ export function renderIndexPage(state) {
         '全体サマリー',
         '試合進行の全体像と入力受付状態を表示します。'
       )}
-      <div class="summary-grid">
+      <div class="summary-grid summary-grid--dashboard">
         <article class="summary-card">
           <p class="summary-card__label">進行中試合</p>
           <p class="summary-card__value">${inProgressCount}</p>
@@ -94,11 +116,14 @@ export function renderIndexPage(state) {
         'コート状況一覧',
         '各コートの現在試合と次試合をカード形式で確認できます。'
       )}
-      <div class="court-grid">
+      <div class="court-grid court-grid--dashboard">
         ${courts
           .map((court) => {
             const courtMatches = matches.filter((match) => match.courtId === court.id);
             const { currentMatch, nextMatch } = buildCourtSummary(court, courtMatches);
+            const remainingMatchCount = courtMatches.filter(
+              (match) => match.status === 'scheduled' || match.status === 'in_progress'
+            ).length;
 
             return `
               <button
@@ -111,6 +136,7 @@ export function renderIndexPage(state) {
                   <span>
                     <span class="court-card__eyebrow">${court.name}</span>
                     <strong class="court-card__title">${court.assignedTeams.length}チーム所属</strong>
+                    <span class="court-card__submeta">残り${remainingMatchCount}試合</span>
                   </span>
                   ${renderStatusBadge(currentMatch?.status || 'scheduled')}
                 </span>
@@ -128,7 +154,9 @@ export function renderIndexPage(state) {
                   <span class="court-card__meta">
                     ${nextMatch ? `${nextMatch.teamA} vs ${nextMatch.teamB}` : '予定未登録'}
                   </span>
+                  <span class="court-card__countdown">${getRemainingText(nextMatch)}</span>
                 </span>
+                <span class="court-card__link">タップして試合一覧へ</span>
               </button>
             `;
           })

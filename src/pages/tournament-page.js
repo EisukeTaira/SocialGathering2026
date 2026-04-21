@@ -52,7 +52,36 @@ export function renderTournamentPage(state) {
         '試合ボード',
         '各試合の開始時刻、対戦カード、結果を一覧表示します。'
       )}
-      <div class="table-shell">
+      <div class="match-card-list" aria-label="スマホ向け試合一覧">
+        ${courtMatches
+          .map((match) => {
+            const score = scoreMap.get(match.id);
+            const status = match.scoreLocked ? 'locked' : match.status;
+
+            return `
+              <article class="match-card">
+                <header class="match-card__header">
+                  <p class="match-card__order">第${String(match.order).padStart(2, '0')}試合</p>
+                  ${renderStatusBadge(status)}
+                </header>
+                <p class="match-card__time">${match.scheduledAt}</p>
+                <p class="match-card__teams">${match.teamA} vs ${match.teamB}</p>
+                <dl class="match-card__meta">
+                  <div>
+                    <dt>スコア</dt>
+                    <dd>${getScoreLabel(score)}</dd>
+                  </div>
+                  <div>
+                    <dt>勝者</dt>
+                    <dd>${match.winner || '-'}</dd>
+                  </div>
+                </dl>
+              </article>
+            `;
+          })
+          .join('')}
+      </div>
+      <div class="table-shell table-shell--desktop-only">
         <table class="match-table">
           <thead>
             <tr>

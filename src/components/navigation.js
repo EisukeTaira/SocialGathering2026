@@ -1,8 +1,8 @@
 const NAV_ITEMS = [
-  { id: 'index', label: 'Index' },
-  { id: 'tournament', label: 'Tournament' },
-  { id: 'score-input', label: 'ScoreInput' },
-  { id: 'admin', label: 'Admin' },
+  { id: 'index', label: 'Index', shortLabel: 'ホーム' },
+  { id: 'tournament', label: 'Tournament', shortLabel: '試合' },
+  { id: 'score-input', label: 'ScoreInput', shortLabel: '入力' },
+  { id: 'admin', label: 'Admin', shortLabel: '管理' },
 ];
 
 export function renderNavigation(selectedPage) {
@@ -15,7 +15,8 @@ export function renderNavigation(selectedPage) {
             class="site-nav__button${selectedPage === item.id ? ' is-active' : ''}"
             data-route="${item.id}"
           >
-            ${item.label}
+            <span class="site-nav__label site-nav__label--short">${item.shortLabel}</span>
+            <span class="site-nav__label site-nav__label--full">${item.label}</span>
           </button>
         `
       ).join('')}

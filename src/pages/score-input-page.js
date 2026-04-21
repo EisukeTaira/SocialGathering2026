@@ -31,6 +31,15 @@ export function renderScoreInputPage(state) {
         '結果入力フォーム',
         '対象試合を選択するとチーム名が自動表示されます。'
       )}
+      <div class="match-preview${selectedMatch ? '' : ' is-empty'}">
+        <p class="match-preview__label">選択中の試合</p>
+        <p class="match-preview__teams">
+          ${selectedMatch ? `${escapeHtml(selectedMatch.teamA)} vs ${escapeHtml(selectedMatch.teamB)}` : '試合を選択してください'}
+        </p>
+        <p class="match-preview__meta">
+          ${selectedMatch ? `${selectedMatch.scheduledAt} / 第${selectedMatch.order}試合` : '未選択'}
+        </p>
+      </div>
       <form class="form-grid" data-form="score-input">
         <label class="form-field">
           <span>コート名</span>
@@ -73,17 +82,19 @@ export function renderScoreInputPage(state) {
           <p>${selectedMatch ? escapeHtml(selectedMatch.teamB) : '-'}</p>
         </div>
 
-        <label class="form-field">
-          <span>チームAスコア</span>
-          <input type="number" name="teamAScore" min="0" inputmode="numeric">
-        </label>
+        <div class="score-input-grid">
+          <label class="form-field score-input-grid__field">
+            <span>チームAスコア</span>
+            <input type="number" name="teamAScore" min="0" inputmode="numeric">
+          </label>
 
-        <label class="form-field">
-          <span>チームBスコア</span>
-          <input type="number" name="teamBScore" min="0" inputmode="numeric">
-        </label>
+          <label class="form-field score-input-grid__field">
+            <span>チームBスコア</span>
+            <input type="number" name="teamBScore" min="0" inputmode="numeric">
+          </label>
+        </div>
 
-        <div class="form-actions">
+        <div class="form-actions form-actions--sticky-mobile">
           <button type="submit" class="action-button" ${state.scoreInputEnabled ? '' : 'disabled'}>
             結果を送信
           </button>

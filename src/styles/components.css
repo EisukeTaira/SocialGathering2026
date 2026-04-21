@@ -27,6 +27,14 @@
   box-shadow: inset 0 0 0 1px rgba(29, 36, 51, 0.08);
 }
 
+.site-nav__label {
+  display: block;
+}
+
+.site-nav__label--full {
+  display: none;
+}
+
 .site-nav__button.is-active,
 .tab-row__button.is-active {
   background: linear-gradient(135deg, var(--color-accent), var(--color-gold));
@@ -35,7 +43,8 @@
 
 .summary-grid,
 .court-grid,
-.team-lists {
+.team-lists,
+.match-card-list {
   display: grid;
   gap: 1rem;
 }
@@ -43,7 +52,9 @@
 .summary-card,
 .court-card,
 .team-list-card,
-.schedule-slot {
+.schedule-slot,
+.match-card,
+.match-preview {
   padding: 1rem;
   border-radius: var(--radius-medium);
   border: 1px solid rgba(29, 36, 51, 0.08);
@@ -52,7 +63,9 @@
 
 .summary-card__label,
 .court-card__label,
-.schedule-slot__meta {
+.schedule-slot__meta,
+.court-card__submeta,
+.court-card__countdown {
   color: var(--color-muted);
 }
 
@@ -144,6 +157,24 @@
   flex-direction: column;
 }
 
+.court-card__link {
+  color: var(--color-accent-deep);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.court-card__submeta,
+.court-card__countdown {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.85rem;
+}
+
+.court-card__countdown {
+  color: var(--color-accent-deep);
+  font-weight: 700;
+}
+
 .status-badge {
   display: inline-flex;
   align-items: center;
@@ -199,8 +230,114 @@
   opacity: 0.45;
 }
 
+.form-actions--sticky-mobile {
+  position: sticky;
+  bottom: 0.75rem;
+  z-index: 5;
+  margin-top: 0.25rem;
+  padding: 0.75rem;
+  border-radius: 1rem;
+  background: rgba(249, 246, 241, 0.92);
+  backdrop-filter: blur(0.75rem);
+  box-shadow: 0 0.75rem 1.5rem rgba(29, 36, 51, 0.12);
+}
+
+.form-actions--sticky-mobile .action-button {
+  width: 100%;
+  justify-content: center;
+}
+
 .table-shell {
   overflow-x: auto;
+}
+
+.table-shell--desktop-only {
+  display: none;
+}
+
+.match-card__header,
+.match-card__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.match-card__header {
+  align-items: start;
+}
+
+.match-card__order,
+.match-card__time,
+.match-card__teams,
+.match-card__meta dt,
+.match-card__meta dd,
+.match-preview__label,
+.match-preview__teams,
+.match-preview__meta {
+  margin: 0;
+}
+
+.match-card__order,
+.match-preview__label {
+  color: var(--color-muted);
+}
+
+.match-card__time {
+  margin-top: 0.6rem;
+  color: var(--color-accent-deep);
+  font-weight: 700;
+}
+
+.match-card__teams,
+.match-preview__teams {
+  margin-top: 0.35rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.match-card__meta {
+  margin-top: 0.85rem;
+}
+
+.match-card__meta div {
+  min-width: 0;
+}
+
+.match-card__meta dt {
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+
+.match-card__meta dd {
+  margin-top: 0.25rem;
+  font-weight: 700;
+}
+
+.match-preview {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(249, 246, 241, 0.88)),
+    linear-gradient(120deg, rgba(217, 93, 57, 0.08), rgba(233, 180, 76, 0.16));
+}
+
+.match-preview.is-empty {
+  opacity: 0.8;
+}
+
+.match-preview__meta {
+  margin-top: 0.4rem;
+  color: var(--color-muted);
+}
+
+.score-input-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.score-input-grid__field input {
+  text-align: center;
+  font-size: 1.3rem;
+  font-weight: 700;
 }
 
 .match-table {
@@ -307,6 +444,14 @@
 }
 
 @media (min-width: 40rem) {
+  .site-nav__label--short {
+    display: none;
+  }
+
+  .site-nav__label--full {
+    display: block;
+  }
+
   .site-nav {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
@@ -320,6 +465,11 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .score-input-grid {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .form-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -328,10 +478,31 @@
   .form-actions--split {
     grid-column: 1 / -1;
   }
+
+  .form-actions--sticky-mobile {
+    position: static;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    backdrop-filter: none;
+    box-shadow: none;
+  }
+
+  .form-actions--sticky-mobile .action-button {
+    width: auto;
+  }
 }
 
 @media (min-width: 64rem) {
   .court-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .match-card-list {
+    display: none;
+  }
+
+  .table-shell--desktop-only {
+    display: block;
   }
 }

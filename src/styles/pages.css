@@ -26,3 +26,11 @@
   display: grid;
   gap: 1rem;
 }
+
+@media (max-width: 39.9375rem) {
+  .page-hero--dashboard .page-hero__description,
+  .page-hero--tournament .page-hero__description,
+  .page-hero--score-input .page-hero__description {
+    max-width: 26rem;
+  }
+}
