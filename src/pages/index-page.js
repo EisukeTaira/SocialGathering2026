@@ -80,8 +80,7 @@ export function renderIndexPage(state) {
         '固定タイムテーブル',
         '全コート共通の試合開始時刻です。Admin で変更するとここへ反映されます。'
       )}
-      <div class="schedule-strip" role="list" aria-label="固定タイムテーブル">
-          <div class="schedule-strip schedule-strip--dashboard" role="list" aria-label="固定タイムテーブル">
+      <div class="schedule-strip schedule-strip--dashboard" role="list" aria-label="固定タイムテーブル">
         ${scheduleSlots
           .map(
             (slot, index) => `

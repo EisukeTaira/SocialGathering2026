@@ -1,11 +1,11 @@
-import { renderNavigation } from '../components/navigation.js?v=20260421-01';
-import { regenerateCourtTournamentData } from '../data/mock-data.js?v=20260421-01';
-import { renderAdminPage } from '../pages/admin-page.js?v=20260421-01';
-import { renderIndexPage } from '../pages/index-page.js?v=20260421-01';
-import { renderScoreInputPage } from '../pages/score-input-page.js?v=20260421-01';
-import { renderTournamentPage } from '../pages/tournament-page.js?v=20260421-01';
-import { navigate, syncRouteFromHash } from './router.js?v=20260421-01';
-import { getState, setState, subscribe, updateData } from './store.js?v=20260421-01';
+import { renderNavigation } from '../components/navigation.js?v=20260421-02';
+import { regenerateCourtTournamentData } from '../data/mock-data.js?v=20260421-02';
+import { renderAdminPage } from '../pages/admin-page.js?v=20260421-02';
+import { renderIndexPage } from '../pages/index-page.js?v=20260421-02';
+import { renderScoreInputPage } from '../pages/score-input-page.js?v=20260421-02';
+import { renderTournamentPage } from '../pages/tournament-page.js?v=20260421-02';
+import { navigate, syncRouteFromHash } from './router.js?v=20260421-02';
+import { getState, setState, subscribe, updateData } from './store.js?v=20260421-02';
 
 const appElement = document.querySelector('#app');
 
@@ -415,7 +415,6 @@ function bindEvents() {
 }
 
 subscribe(renderApp);
-window.addEventListener('hashchange', () => {
 window.addEventListener('hashchange', syncRouteFromHash);
 bindEvents();
 syncRouteFromHash();
