@@ -1,4 +1,4 @@
-import { getState, setState } from './store.js?v=20260421-05';
+import { getState, setState } from './store.js?v=20260421-06';
 
 export const ROUTES = {
   index: 'index',

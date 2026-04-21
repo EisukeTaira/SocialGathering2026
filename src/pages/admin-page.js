@@ -235,7 +235,7 @@ export function renderAdminPage(state) {
         ${renderSectionTitle(
           'Schedule Slots',
           '固定タイムテーブル編集',
-          '全コート共通で使用する試合時刻を一括編集できます。保存時に既存試合へ同期します。'
+          '全コート共通で使用する試合時刻を一括編集できます。9:30から15:00の範囲で保存時に既存試合へ同期します。'
         )}
         <form class="schedule-editor" data-form="admin-schedule">
           ${scheduleSlots
@@ -243,7 +243,7 @@ export function renderAdminPage(state) {
               (slot, index) => `
                 <label class="schedule-editor__row">
                   <span class="schedule-editor__label">第${index + 1}枠</span>
-                  <input type="time" name="slot-${index}" value="${slot}">
+                  <input type="time" name="slot-${index}" value="${slot}" min="09:30" max="15:00">
                 </label>
               `
             )

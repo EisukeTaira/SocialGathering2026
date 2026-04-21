@@ -1,17 +1,44 @@
-import { renderNavigation } from '../components/navigation.js?v=20260421-05';
-import { regenerateCourtTournamentData } from '../data/mock-data.js?v=20260421-05';
-import { renderAdminPage } from '../pages/admin-page.js?v=20260421-05';
-import { renderIndexPage } from '../pages/index-page.js?v=20260421-05';
-import { renderScoreInputPage } from '../pages/score-input-page.js?v=20260421-05';
-import { renderTournamentPage } from '../pages/tournament-page.js?v=20260421-05';
+import { renderNavigation } from '../components/navigation.js?v=20260421-06';
+import {
+  regenerateCourtTournamentData,
+  SCHEDULE_TIME_LIMITS,
+} from '../data/mock-data.js?v=20260421-06';
+import { renderAdminPage } from '../pages/admin-page.js?v=20260421-06';
+import { renderIndexPage } from '../pages/index-page.js?v=20260421-06';
+import { renderScoreInputPage } from '../pages/score-input-page.js?v=20260421-06';
+import { renderTournamentPage } from '../pages/tournament-page.js?v=20260421-06';
 import {
   ROUTES,
   navigate,
   syncRouteFromHash,
-} from './router.js?v=20260421-05';
-import { getState, setState, subscribe, updateData } from './store.js?v=20260421-05';
+} from './router.js?v=20260421-06';
+import { getState, setState, subscribe, updateData } from './store.js?v=20260421-06';
 
 const appElement = document.querySelector('#app');
+
+function parseTimeToMinutes(timeText) {
+  const [hoursText, minutesText] = String(timeText).split(':');
+  const hours = Number(hoursText);
+  const minutes = Number(minutesText);
+
+  if (Number.isNaN(hours) || Number.isNaN(minutes)) {
+    return null;
+  }
+
+  return hours * 60 + minutes;
+}
+
+function isWithinScheduleRange(timeText) {
+  const timeInMinutes = parseTimeToMinutes(timeText);
+  const minInMinutes = parseTimeToMinutes(SCHEDULE_TIME_LIMITS.min);
+  const maxInMinutes = parseTimeToMinutes(SCHEDULE_TIME_LIMITS.max);
+
+  if (timeInMinutes === null || minInMinutes === null || maxInMinutes === null) {
+    return false;
+  }
+
+  return timeInMinutes >= minInMinutes && timeInMinutes <= maxInMinutes;
+}
 
 function renderCurrentPage(state) {
   switch (state.selectedPage) {
@@ -163,6 +190,13 @@ function handleAdminSubmit(formElement) {
     return;
   }
 
+  if (!isWithinScheduleRange(scheduledAt)) {
+    setState({
+      adminMessage: `開始予定時刻は${SCHEDULE_TIME_LIMITS.min}から${SCHEDULE_TIME_LIMITS.max}の範囲で入力してください。`,
+    });
+    return;
+  }
+
   const hasScores = teamAScoreRaw !== '' && teamBScoreRaw !== '';
   const teamAScore = Number(teamAScoreRaw);
   const teamBScore = Number(teamBScoreRaw);
@@ -284,6 +318,7 @@ function handleAdminScheduleSubmit(formElement) {
   const timePattern = /^\d{2}:\d{2}$/;
   const hasInvalidValue = slots.some((slot) => !timePattern.test(slot));
   const hasDuplicate = new Set(slots).size !== slots.length;
+  const hasOutOfRange = slots.some((slot) => !isWithinScheduleRange(slot));
 
   if (hasInvalidValue) {
     setState({
@@ -297,6 +332,15 @@ function handleAdminScheduleSubmit(formElement) {
   if (hasDuplicate) {
     setState({
       adminScheduleMessage: '同じ時刻は重複登録できません。',
+      adminMessage: '',
+      adminCourtMessage: '',
+    });
+    return;
+  }
+
+  if (hasOutOfRange) {
+    setState({
+      adminScheduleMessage: `固定タイムテーブルは${SCHEDULE_TIME_LIMITS.min}から${SCHEDULE_TIME_LIMITS.max}の範囲で入力してください。`,
       adminMessage: '',
       adminCourtMessage: '',
     });

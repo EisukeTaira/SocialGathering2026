@@ -1,4 +1,4 @@
-import { ROUTES } from '../app/router.js?v=20260421-05';
+import { ROUTES } from '../app/router.js?v=20260421-06';
 
 const NAV_ITEMS = [
   { id: ROUTES.index, label: 'Index', shortLabel: 'Index' },
