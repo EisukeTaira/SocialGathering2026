@@ -1,11 +1,11 @@
-import { renderNavigation } from '../components/navigation.js?v=20260421-03';
-import { regenerateCourtTournamentData } from '../data/mock-data.js?v=20260421-03';
-import { renderAdminPage } from '../pages/admin-page.js?v=20260421-03';
-import { renderIndexPage } from '../pages/index-page.js?v=20260421-03';
-import { renderScoreInputPage } from '../pages/score-input-page.js?v=20260421-03';
-import { renderTournamentPage } from '../pages/tournament-page.js?v=20260421-03';
-import { navigate, syncRouteFromHash } from './router.js?v=20260421-03';
-import { getState, setState, subscribe, updateData } from './store.js?v=20260421-03';
+import { renderNavigation } from '../components/navigation.js?v=20260421-04';
+import { regenerateCourtTournamentData } from '../data/mock-data.js?v=20260421-04';
+import { renderAdminPage } from '../pages/admin-page.js?v=20260421-04';
+import { renderIndexPage } from '../pages/index-page.js?v=20260421-04';
+import { renderScoreInputPage } from '../pages/score-input-page.js?v=20260421-04';
+import { renderTournamentPage } from '../pages/tournament-page.js?v=20260421-04';
+import { navigate, syncRouteFromHash } from './router.js?v=20260421-04';
+import { getState, setState, subscribe, updateData } from './store.js?v=20260421-04';
 
 const appElement = document.querySelector('#app');
 

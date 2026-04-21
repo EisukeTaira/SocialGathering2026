@@ -77,11 +77,11 @@ export function renderIndexPage(state) {
           <span class="hero-chip">受付 ${state.scoreInputEnabled ? 'ON' : 'OFF'}</span>
         </div>
         <div class="dashboard-priority-grid" aria-label="優先確認情報">
-          <article class="dashboard-priority-card">
+          <article class="dashboard-priority-card dashboard-priority-card--time">
             <p class="dashboard-priority-card__label">次の一斉開始</p>
             <p class="dashboard-priority-card__value">${nextScheduleSlot}</p>
           </article>
-          <article class="dashboard-priority-card">
+          <article class="dashboard-priority-card dashboard-priority-card--count">
             <p class="dashboard-priority-card__label">終了試合</p>
             <p class="dashboard-priority-card__value">${completedCount}</p>
           </article>
@@ -99,34 +99,36 @@ export function renderIndexPage(state) {
         '固定タイムテーブル',
         '全コート共通の試合開始時刻です。Admin で変更するとここへ反映されます。'
       )}
-      <div class="schedule-strip schedule-strip--dashboard" role="list" aria-label="固定タイムテーブル">
-        ${scheduleSlots
-          .map(
-            (slot, index) => `
-              <article class="schedule-slot" role="listitem">
-                <p class="schedule-slot__time">${slot}</p>
-                <p class="schedule-slot__meta">第${index + 1}枠</p>
-              </article>
-            `
-          )
-          .join('')}
+      <div class="dashboard-schedule-layout">
+        <div class="schedule-strip schedule-strip--dashboard" role="list" aria-label="固定タイムテーブル">
+          ${scheduleSlots
+            .map(
+              (slot, index) => `
+                <article class="schedule-slot" role="listitem">
+                  <p class="schedule-slot__time">${slot}</p>
+                  <p class="schedule-slot__meta">第${index + 1}枠</p>
+                </article>
+              `
+            )
+            .join('')}
+        </div>
+        ${eventNotes.length
+          ? `
+            <div class="schedule-note-list">
+              ${eventNotes
+                .map(
+                  (item) => `
+                    <p class="schedule-note-list__item">
+                      <span class="schedule-note-list__time">${item.time}</span>
+                      <span class="schedule-note-list__text">${item.label}</span>
+                    </p>
+                  `
+                )
+                .join('')}
+            </div>
+          `
+          : ''}
       </div>
-      ${eventNotes.length
-        ? `
-          <div class="schedule-note-list">
-            ${eventNotes
-              .map(
-                (item) => `
-                  <p class="schedule-note-list__item">
-                    <span class="schedule-note-list__time">${item.time}</span>
-                    <span class="schedule-note-list__text">${item.label}</span>
-                  </p>
-                `
-              )
-              .join('')}
-          </div>
-        `
-        : ''}
     </section>
 
     <section class="surface-block">
