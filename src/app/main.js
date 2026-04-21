@@ -30,9 +30,11 @@ function renderApp(state) {
         <div>
           <p class="site-header__eyebrow">SocialGathering2026</p>
           <h1 class="site-header__title">バレー大会 Webアプリ</h1>
+          <p class="site-header__page-state">現在ページ: ${state.selectedPage}</p>
         </div>
         <p class="site-header__meta">最終更新: ${state.lastUpdatedAt}</p>
       </header>
+      <p class="debug-banner">${state.debugMessage || 'デバッグ情報なし'}</p>
       ${renderNavigation(state.selectedPage)}
       <main class="site-main">
         ${renderCurrentPage(state)}
@@ -316,17 +318,25 @@ function bindEvents() {
     const routeTrigger = event.target.closest('[data-route]');
     if (routeTrigger) {
       event.preventDefault();
+      const routeName = routeTrigger.getAttribute('data-route');
       const nextCourt = routeTrigger.getAttribute('data-select-court');
       if (nextCourt) {
         updateSelectedCourt(nextCourt);
       }
-      navigate(routeTrigger.getAttribute('data-route'));
+      setState({
+        debugMessage: `クリック検知: route=${routeName} hash=${window.location.hash || '(empty)'}`,
+      });
+      navigate(routeName);
       return;
     }
 
     const courtTrigger = event.target.closest('[data-select-court]');
     if (courtTrigger) {
+      const selectedCourtId = courtTrigger.getAttribute('data-select-court');
       updateSelectedCourt(courtTrigger.getAttribute('data-select-court'));
+      setState({
+        debugMessage: `コート切替クリック: court=${selectedCourtId}`,
+      });
       if (getState().selectedPage !== 'tournament') {
         navigate('tournament');
       }
@@ -414,7 +424,10 @@ function bindEvents() {
 }
 
 subscribe(renderApp);
-window.addEventListener('hashchange', syncRouteFromHash);
+window.addEventListener('hashchange', () => {
+  setState({ debugMessage: `hashchange 発火: ${window.location.hash || '(empty)'}` });
+  syncRouteFromHash();
+});
 bindEvents();
 syncRouteFromHash();
 renderApp(getState());

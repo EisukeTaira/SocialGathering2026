@@ -243,6 +243,7 @@ export const initialState = {
   selectedMatchId: '',
   noticeMessage: '昼休憩後の再集合は12:50です。各コート代表は進行確認を行ってください。',
   lastUpdatedAt: '2026-04-21 08:45',
+  debugMessage: '初期状態: index を表示予定',
   scoreInputEnabled: true,
   scoreFormMessage: '',
   scoreFormError: '',
