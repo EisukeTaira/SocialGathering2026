@@ -16,10 +16,7 @@ export function renderIndexPage(state) {
   const { courts, matches, scheduleOverview, scheduleSlots } = state.data;
   const completedCount = matches.filter((match) => match.status === 'completed').length;
   const inProgressCount = matches.filter((match) => match.status === 'in_progress').length;
-  const overviewItems = scheduleOverview || scheduleSlots.map((slot, index) => ({
-    time: slot,
-    label: `第${index + 1}枠`,
-  }));
+  const eventNotes = scheduleOverview || [];
 
   return `
     <section class="page-hero page-hero--dashboard">
@@ -40,20 +37,33 @@ export function renderIndexPage(state) {
       ${renderSectionTitle(
         'Time Schedule',
         '固定タイムテーブル',
-        '全コート共通の開始時刻一覧です。'
+        '全コート共通の試合開始時刻です。Admin で変更するとここへ反映されます。'
       )}
       <div class="schedule-strip" role="list" aria-label="固定タイムテーブル">
-        ${overviewItems
+        ${scheduleSlots
           .map(
-            (item) => `
+            (slot, index) => `
               <article class="schedule-slot" role="listitem">
-                <p class="schedule-slot__time">${item.time}</p>
-                <p class="schedule-slot__meta">${item.label}</p>
+                <p class="schedule-slot__time">${slot}</p>
+                <p class="schedule-slot__meta">第${index + 1}枠</p>
               </article>
             `
           )
           .join('')}
       </div>
+      ${eventNotes.length
+        ? `
+          <div class="schedule-note-list">
+            ${eventNotes
+              .map(
+                (item) => `
+                  <p class="schedule-note-list__item">${item.time} | ${item.label}</p>
+                `
+              )
+              .join('')}
+          </div>
+        `
+        : ''}
     </section>
 
     <section class="surface-block">

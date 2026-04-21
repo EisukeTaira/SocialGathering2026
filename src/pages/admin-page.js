@@ -30,8 +30,19 @@ function buildAdminFormValues(state) {
   };
 }
 
+function buildCourtTeamValues(state) {
+  const selectedCourt =
+    state.data.courts.find((court) => court.id === state.selectedCourtId) || state.data.courts[0];
+
+  return {
+    selectedCourt,
+    teamText: selectedCourt.assignedTeams.join('\n'),
+  };
+}
+
 export function renderAdminPage(state) {
   const formValues = buildAdminFormValues(state);
+  const courtTeamValues = buildCourtTeamValues(state);
   const { courts, matches, scheduleSlots } = state.data;
 
   return `
@@ -187,11 +198,69 @@ export function renderAdminPage(state) {
       </section>
     </section>
 
+    <section class="admin-grid admin-grid--secondary">
+      <section class="surface-block">
+        ${renderSectionTitle(
+          'Court Teams',
+          'コート所属チーム編集',
+          '選択したコートの所属チームを改行区切りで編集できます。'
+        )}
+        <form class="form-grid" data-form="admin-court-teams">
+          <label class="form-field">
+            <span>編集対象コート</span>
+            <select name="courtId" data-role="admin-court-select">
+              ${courts
+                .map(
+                  (court) => `
+                    <option value="${court.id}" ${court.id === courtTeamValues.selectedCourt.id ? 'selected' : ''}>
+                      ${court.name}
+                    </option>
+                  `
+                )
+                .join('')}
+            </select>
+          </label>
+          <label class="form-field form-field--full">
+            <span>所属チーム一覧</span>
+            <textarea name="teamList" rows="10">${escapeHtml(courtTeamValues.teamText)}</textarea>
+          </label>
+          <div class="form-actions form-actions--split">
+            <button type="submit" class="action-button">所属チームを保存</button>
+          </div>
+        </form>
+        ${state.adminCourtMessage ? `<p class="feedback-message is-success">${escapeHtml(state.adminCourtMessage)}</p>` : ''}
+      </section>
+
+      <section class="surface-block">
+        ${renderSectionTitle(
+          'Schedule Slots',
+          '固定タイムテーブル編集',
+          '全コート共通で使用する試合時刻を一括編集できます。保存時に既存試合へ同期します。'
+        )}
+        <form class="schedule-editor" data-form="admin-schedule">
+          ${scheduleSlots
+            .map(
+              (slot, index) => `
+                <label class="schedule-editor__row">
+                  <span class="schedule-editor__label">第${index + 1}枠</span>
+                  <input type="time" name="slot-${index}" value="${slot}">
+                </label>
+              `
+            )
+            .join('')}
+          <div class="form-actions form-actions--split">
+            <button type="submit" class="action-button">タイムテーブルを保存</button>
+          </div>
+        </form>
+        ${state.adminScheduleMessage ? `<p class="feedback-message is-success">${escapeHtml(state.adminScheduleMessage)}</p>` : ''}
+      </section>
+    </section>
+
     <section class="surface-block">
       ${renderSectionTitle(
-        'Court Teams',
-        'コート所属チーム',
-        '固定所属のチームをコートごとに確認できます。'
+        'Court Teams Snapshot',
+        'コート所属チーム一覧',
+        '現在登録されている固定所属チームの確認用一覧です。'
       )}
       <div class="team-lists">
         ${courts

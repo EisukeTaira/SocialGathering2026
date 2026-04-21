@@ -116,6 +116,10 @@
   gap: 1.25rem;
 }
 
+.admin-grid--secondary {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 @media (min-width: 48rem) {
   .page-hero {
     grid-template-columns: minmax(0, 1.7fr) minmax(18rem, 1fr);
@@ -124,5 +128,9 @@
 
   .admin-grid {
     grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  }
+
+  .admin-grid--secondary {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
 }

@@ -1,4 +1,5 @@
 import { renderNavigation } from '../components/navigation.js';
+import { regenerateCourtTournamentData } from '../data/mock-data.js';
 import { renderAdminPage } from '../pages/admin-page.js';
 import { renderIndexPage } from '../pages/index-page.js';
 import { renderScoreInputPage } from '../pages/score-input-page.js';
@@ -59,6 +60,32 @@ function upsertScore(data, matchId, teamAScore, teamBScore) {
   }
 
   data.scores.push(nextScore);
+}
+
+function parseTeamList(teamListText) {
+  return teamListText
+    .split(/\r?\n|,/)
+    .map((team) => team.trim())
+    .filter(Boolean);
+}
+
+function sortMatches(data) {
+  data.matches.sort((left, right) => {
+    if (left.courtId === right.courtId) {
+      return left.order - right.order;
+    }
+    return left.courtId.localeCompare(right.courtId, 'ja');
+  });
+}
+
+function syncMatchScheduleTimes(data) {
+  data.matches.forEach((match) => {
+    match.scheduledAt = data.scheduleSlots[(match.order - 1) % data.scheduleSlots.length];
+  });
+
+  data.courts.forEach((court) => {
+    court.scheduleSlots = [...data.scheduleSlots];
+  });
 }
 
 function handleScoreSubmit(formElement) {
@@ -181,17 +208,106 @@ function handleAdminSubmit(formElement) {
       upsertScore(data, existingMatch ? existingMatch.id : `${courtId}-${String(order).padStart(2, '0')}-N`, teamAScore, teamBScore);
     }
 
-    data.matches.sort((left, right) => {
-      if (left.courtId === right.courtId) {
-        return left.order - right.order;
-      }
-      return left.courtId.localeCompare(right.courtId, 'ja');
-    });
+    sortMatches(data);
   });
 
   setState({
     adminEditingMatchId: '',
+    adminCourtMessage: '',
+    adminScheduleMessage: '',
     adminMessage: id ? '試合情報を更新しました。' : '試合を新規登録しました。',
+  });
+}
+
+function handleAdminCourtTeamsSubmit(formElement) {
+  const formData = new FormData(formElement);
+  const courtId = String(formData.get('courtId') || '');
+  const teamListText = String(formData.get('teamList') || '');
+  const teams = parseTeamList(teamListText);
+
+  if (!courtId || teams.length < 2) {
+    setState({
+      adminCourtMessage: '所属チームは2チーム以上入力してください。',
+      adminMessage: '',
+      adminScheduleMessage: '',
+    });
+    return;
+  }
+
+  const confirmed = window.confirm(
+    `${courtId}コートの所属チームを更新すると、このコートの既存試合結果と対戦カードは削除され、` +
+      '総当たり試合が再生成されます。続行しますか?'
+  );
+
+  if (!confirmed) {
+    setState({
+      adminCourtMessage: '所属チームの更新をキャンセルしました。',
+      adminMessage: '',
+      adminScheduleMessage: '',
+    });
+    return;
+  }
+
+  updateData((data) => {
+    const court = data.courts.find((item) => item.id === courtId);
+    if (!court) {
+      return;
+    }
+
+    court.assignedTeams = teams;
+    const regenerated = regenerateCourtTournamentData(courtId, teams, data.scheduleSlots);
+
+    data.matches = data.matches.filter((match) => match.courtId !== courtId);
+    data.scores = data.scores.filter((score) => !score.matchId.startsWith(`${courtId}-`));
+    data.matches.push(...regenerated.matches);
+    data.scores.push(...regenerated.scores);
+    sortMatches(data);
+  });
+
+  setState({
+    selectedCourtId: courtId,
+    selectedMatchId: '',
+    adminEditingMatchId: '',
+    adminMessage: '',
+    adminScheduleMessage: '',
+    adminCourtMessage: `${courtId}コートの所属チームと総当たり試合を再生成しました。`,
+  });
+}
+
+function handleAdminScheduleSubmit(formElement) {
+  const formData = new FormData(formElement);
+  const slots = getState().data.scheduleSlots.map((_, index) => String(formData.get(`slot-${index}`) || '').trim());
+  const timePattern = /^\d{2}:\d{2}$/;
+  const hasInvalidValue = slots.some((slot) => !timePattern.test(slot));
+  const hasDuplicate = new Set(slots).size !== slots.length;
+
+  if (hasInvalidValue) {
+    setState({
+      adminScheduleMessage: 'すべての時間枠を HH:MM 形式で入力してください。',
+      adminMessage: '',
+      adminCourtMessage: '',
+    });
+    return;
+  }
+
+  if (hasDuplicate) {
+    setState({
+      adminScheduleMessage: '同じ時刻は重複登録できません。',
+      adminMessage: '',
+      adminCourtMessage: '',
+    });
+    return;
+  }
+
+  updateData((data) => {
+    data.scheduleSlots = slots;
+    syncMatchScheduleTimes(data);
+  });
+
+  setState({
+    adminMessage: '',
+    adminCourtMessage: '',
+    adminScheduleMessage: '固定タイムテーブルを更新し、全試合の開始時刻へ同期しました。',
   });
 }
 
@@ -250,6 +366,15 @@ function bindEvents() {
       return;
     }
 
+    const adminCourtSelect = event.target.closest('[data-role="admin-court-select"]');
+    if (adminCourtSelect) {
+      setState({
+        selectedCourtId: adminCourtSelect.value,
+        adminCourtMessage: '',
+      });
+      return;
+    }
+
     const matchSelect = event.target.closest('[data-role="score-match-select"]');
     if (matchSelect) {
       setState({ selectedMatchId: matchSelect.value, scoreFormError: '', scoreFormMessage: '' });
@@ -271,6 +396,18 @@ function bindEvents() {
     if (formElement.matches('[data-form="admin"]')) {
       event.preventDefault();
       handleAdminSubmit(formElement);
+      return;
+    }
+
+    if (formElement.matches('[data-form="admin-court-teams"]')) {
+      event.preventDefault();
+      handleAdminCourtTeamsSubmit(formElement);
+      return;
+    }
+
+    if (formElement.matches('[data-form="admin-schedule"]')) {
+      event.preventDefault();
+      handleAdminScheduleSubmit(formElement);
     }
   });
 }

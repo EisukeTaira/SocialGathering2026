@@ -138,7 +138,7 @@ function buildScore(order) {
   return [21, losingScore];
 }
 
-function buildRoundRobinMatches(courtConfig) {
+function buildRoundRobinMatches(courtConfig, scheduleSlots = SCHEDULE_SLOTS) {
   const matches = [];
   let order = 1;
 
@@ -152,7 +152,7 @@ function buildRoundRobinMatches(courtConfig) {
         id: `${courtConfig.id}-${String(order).padStart(2, '0')}`,
         courtId: courtConfig.id,
         order,
-        scheduledAt: SCHEDULE_SLOTS[(order - 1) % SCHEDULE_SLOTS.length],
+        scheduledAt: scheduleSlots[(order - 1) % scheduleSlots.length],
         teamA: courtConfig.teams[teamIndex],
         teamB: courtConfig.teams[opponentIndex],
         status: getMatchStatus(courtConfig.id, order),
@@ -181,6 +181,22 @@ function buildInitialScores(matches) {
         teamBScore,
       };
     });
+}
+
+export function regenerateCourtTournamentData(courtId, teams, scheduleSlots = SCHEDULE_SLOTS) {
+  const courtConfig = {
+    id: courtId,
+    name: `${courtId}コート`,
+    teams,
+  };
+  const matches = buildRoundRobinMatches(courtConfig, scheduleSlots);
+  const scores = buildInitialScores(matches);
+  const hydratedMatches = applyResults(matches, scores);
+
+  return {
+    matches: hydratedMatches,
+    scores,
+  };
 }
 
 function applyResults(matches, scores) {
@@ -231,5 +247,7 @@ export const initialState = {
   scoreFormMessage: '',
   scoreFormError: '',
   adminMessage: '',
+  adminCourtMessage: '',
+  adminScheduleMessage: '',
   adminEditingMatchId: '',
 };

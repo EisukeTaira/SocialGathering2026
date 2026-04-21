@@ -95,6 +95,17 @@
   font-size: 1.3rem;
 }
 
+.schedule-note-list {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 1rem;
+}
+
+.schedule-note-list__item {
+  margin: 0;
+  color: var(--color-muted);
+}
+
 .court-card {
   display: grid;
   gap: 1rem;
@@ -225,12 +236,22 @@
 }
 
 .form-field input,
-.form-field select {
+.form-field select,
+.form-field textarea {
   width: 100%;
   padding: 0.85rem 1rem;
   border: 1px solid rgba(29, 36, 51, 0.12);
   border-radius: var(--radius-small);
   background: rgba(255, 255, 255, 0.88);
+}
+
+.form-field textarea {
+  min-height: 12rem;
+  resize: vertical;
+}
+
+.form-field--full {
+  grid-column: 1 / -1;
 }
 
 .form-field.is-readonly {
@@ -266,6 +287,23 @@
 
 .feedback-message.is-neutral {
   background: rgba(29, 36, 51, 0.06);
+}
+
+.schedule-editor {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.schedule-editor__row {
+  display: grid;
+  grid-template-columns: minmax(5rem, 7rem) minmax(0, 1fr);
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.schedule-editor__label {
+  color: var(--color-muted);
+  font-weight: 700;
 }
 
 @media (min-width: 40rem) {
