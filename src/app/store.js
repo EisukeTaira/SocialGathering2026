@@ -1,4 +1,4 @@
-import { initialState, tournamentData } from '../data/mock-data.js';
+import { initialState, tournamentData } from '../data/mock-data.js?v=20260421-01';
 
 function cloneData() {
   return {

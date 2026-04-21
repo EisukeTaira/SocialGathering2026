@@ -1,11 +1,11 @@
-import { renderNavigation } from '../components/navigation.js';
-import { regenerateCourtTournamentData } from '../data/mock-data.js';
-import { renderAdminPage } from '../pages/admin-page.js';
-import { renderIndexPage } from '../pages/index-page.js';
-import { renderScoreInputPage } from '../pages/score-input-page.js';
-import { renderTournamentPage } from '../pages/tournament-page.js';
-import { navigate, syncRouteFromHash } from './router.js';
-import { getState, setState, subscribe, updateData } from './store.js';
+import { renderNavigation } from '../components/navigation.js?v=20260421-01';
+import { regenerateCourtTournamentData } from '../data/mock-data.js?v=20260421-01';
+import { renderAdminPage } from '../pages/admin-page.js?v=20260421-01';
+import { renderIndexPage } from '../pages/index-page.js?v=20260421-01';
+import { renderScoreInputPage } from '../pages/score-input-page.js?v=20260421-01';
+import { renderTournamentPage } from '../pages/tournament-page.js?v=20260421-01';
+import { navigate, syncRouteFromHash } from './router.js?v=20260421-01';
+import { getState, setState, subscribe, updateData } from './store.js?v=20260421-01';
 
 const appElement = document.querySelector('#app');
 
