@@ -1,7 +1,15 @@
 import { renderSectionTitle, renderStatusBadge } from '../components/ui.js';
 
 function parseTodayTime(timeText) {
+  if (typeof timeText !== 'string' || !timeText.includes(':')) {
+    return null;
+  }
+
   const [hours, minutes] = timeText.split(':').map(Number);
+  if (Number.isNaN(hours) || Number.isNaN(minutes)) {
+    return null;
+  }
+
   const date = new Date();
   date.setHours(hours, minutes, 0, 0);
   return date;
@@ -12,7 +20,12 @@ function getRemainingText(nextMatch) {
     return '次試合未登録';
   }
 
-  const diffMinutes = Math.round((parseTodayTime(nextMatch.scheduledAt) - new Date()) / 60000);
+  const scheduledDate = parseTodayTime(nextMatch.scheduledAt);
+  if (!scheduledDate) {
+    return '開始時刻未設定';
+  }
+
+  const diffMinutes = Math.round((scheduledDate - new Date()) / 60000);
   if (diffMinutes > 0) {
     return `開始まであと${diffMinutes}分`;
   }
