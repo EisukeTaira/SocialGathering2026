@@ -9,7 +9,8 @@ function parseHash() {
 
 export function syncRouteFromHash() {
   if (!window.location.hash) {
-    window.location.hash = 'index';
+    window.location.hash = '#index';
+    setState({ selectedPage: 'index' });
     return;
   }
 
@@ -23,9 +24,16 @@ export function syncRouteFromHash() {
 
 export function navigate(routeName) {
   const route = VALID_ROUTES.has(routeName) ? routeName : 'index';
-  if (window.location.hash !== `#${route}`) {
-    window.location.hash = route;
+  const nextHash = `#${route}`;
+
+  if (getState().selectedPage !== route) {
+    setState({ selectedPage: route });
+  }
+
+  if (window.location.hash !== nextHash) {
+    window.location.hash = nextHash;
     return;
   }
+
   setState({ selectedPage: route });
 }
